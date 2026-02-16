@@ -12,8 +12,12 @@ export default function Home() {
     });
   };
   return (
-    <div>
-      <h1>Home</h1>
+    <div className="flex items-center justify-center h-screen">
+      <button onClick={handleLogin}
+        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded "
+      >
+        Login with Google
+      </button>
     </div>
   );
 }
