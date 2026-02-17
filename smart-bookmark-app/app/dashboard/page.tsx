@@ -24,6 +24,8 @@ export default function Dashboard() {
                 window.location.href = "/";
             } else {
                 setUser(data.user);
+                // Clean up the access token from the URL
+                window.history.replaceState({}, "", "/dashboard");
             }
         };
 
@@ -89,67 +91,74 @@ export default function Dashboard() {
         window.location.href = "/";
     };
 
-    if (!user) return <div className="p-10">Loading...</div>;
+    if (!user) return <div className="min-h-screen flex items-center justify-center bg-blue-50">Loading...</div>;
 
     return (
-        <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow">
-            <div className="flex justify-between mb-6">
-                <h1 className="text-2xl font-bold">My Bookmarks</h1>
-                <button
-                    onClick={logout}
-                    className="text-red-500 underline text-sm"
-                >
-                    Logout
-                </button>
-            </div>
-
-            {/* Add Form */}
-            <div className="flex flex-col gap-2 mb-6">
-                <input
-                    className="border p-2 rounded"
-                    placeholder="Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                />
-
-                <input
-                    className="border p-2 rounded"
-                    placeholder="URL"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                />
-
-                <button
-                    onClick={addBookmark}
-                    className="bg-black text-white py-2 rounded"
-                >
-                    Add Bookmark
-                </button>
-            </div>
-
-            {/* Bookmark List */}
-            <div className="space-y-3">
-                {bookmarks.map((bookmark) => (
-                    <div
-                        key={bookmark.id}
-                        className="flex justify-between items-center border p-3 rounded"
+        <div className="min-h-screen bg-blue-50 py-10 px-4">
+            <div className="max-w-xl mx-auto bg-white rounded-lg shadow p-6">
+                {/* Header */}
+                <div className="flex justify-between items-center pb-4 mb-6 border-b">
+                    <h1 className="text-2xl font-bold text-blue-600"> My Bookmarks</h1>
+                    <button
+                        onClick={logout}
+                        className="text-red-500 hover:text-red-600 text-sm cursor-pointer"
                     >
-                        <a
-                            href={bookmark.url}
-                            target="_blank"
-                            className="text-blue-600 underline"
-                        >
-                            {bookmark.title}
-                        </a>
+                        Logout
+                    </button>
+                </div>
 
-                        <button
-                            onClick={() => deleteBookmark(bookmark.id)}
-                            className="text-red-500"
+                {/* Add Form */}
+                <div className="flex flex-col gap-2 mb-6 bg-gray-50 p-4 rounded-lg">
+                    <input
+                        className="border border-gray-300 p-2 rounded bg-white"
+                        placeholder="Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+
+                    <input
+                        className="border border-gray-300 p-2 rounded bg-white"
+                        placeholder="URL"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                    />
+
+                    <button
+                        onClick={addBookmark}
+                        className="bg-blue-500 hover:bg-blue-600 text-white py-2 rounded cursor-pointer"
+                    >
+                        + Add Bookmark
+                    </button>
+                </div>
+
+                {/* Bookmark List */}
+                <div className="space-y-2">
+                    {bookmarks.map((bookmark) => (
+                        <div
+                            key={bookmark.id}
+                            className="flex justify-between items-center border border-gray-200 p-3 rounded hover:bg-gray-50"
                         >
-                            Delete
-                        </button>
-                    </div>
-                ))}
+                            <a
+                                href={bookmark.url}
+                                target="_blank"
+                                className="text-blue-600 hover:underline"
+                            >
+                                {bookmark.title}
+                            </a>
+
+                            <button
+                                onClick={() => deleteBookmark(bookmark.id)}
+                                className="text-red-500 hover:text-red-600 text-sm cursor-pointer"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    ))}
+
+                    {bookmarks.length === 0 && (
+                        <p className="text-center text-gray-400 py-6">No bookmarks yet. Add one above!</p>
+                    )}
+                </div>
             </div>
         </div>
     );
