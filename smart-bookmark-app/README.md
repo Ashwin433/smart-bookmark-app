@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smart Bookmark App
 
-## Getting Started
+A simple bookmark manager I built as part of a screening task. You log in with Google, save your favorite links, and they sync in real time across tabs.
 
-First, run the development server:
+**Live app:** https://smart-bookmark-app-black-beta.vercel.app
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## What it does
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Sign in with your Google account (no passwords needed)
+- Add bookmarks with a title and URL
+- Delete bookmarks you no longer need
+- Your bookmarks are private — nobody else can see them
+- Open the app in two tabs, and changes show up instantly in both (real-time sync)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Built with
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js** with App Router
+- **Supabase** for auth, database, and real-time
+- **Tailwind CSS** for styling
+- Deployed on **Vercel**
 
-## Learn More
+## Problems I faced and how I fixed them
 
-To learn more about Next.js, take a look at the following resources:
+### Setting up Google OAuth redirect
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Getting Google login to work was tricky at first. After signing in, the app kept redirecting to `localhost` instead of my Vercel URL. I realized I needed to add my deployed URL to the **Redirect URLs** list in Supabase's Authentication settings. Once I added `https://smart-bookmark-app-black-beta.vercel.app/` there, it worked perfectly.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Supabase Realtime not picking up changes
 
-## Deploy on Vercel
+After setting up the realtime subscription, changes weren't syncing between tabs. I spent some time debugging before I realized I hadn't enabled **Realtime** on the `bookmarks` table in Supabase. You have to go to Database → Tables → select the table → and toggle Realtime on. It's easy to miss.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Vercel build failing with root directory issue
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+My first deploy failed because Vercel couldn't find `package.json`. The project was inside a subdirectory (`smart-bookmark-app/`) rather than at the repo root. I fixed it by changing the **Root Directory** setting in Vercel to point to the right folder.
+
+### Row Level Security blocking all queries
+
+After enabling RLS on the `bookmarks` table, all my queries started returning empty results. I forgot that enabling RLS without adding any policies blocks everything by default. I had to create SELECT, INSERT, and DELETE policies that check `auth.uid() = user_id` so users can only access their own data.
+
+## How to run locally
+
+1. Clone this repo
+2. `npm install`
+3. Create a `.env.local` with your Supabase credentials:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your_url_here
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key_here
+   ```
+4. `npm run dev`
+5. Open http://localhost:3000
